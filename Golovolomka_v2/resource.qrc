@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>../Golovolomka/Lab2img/Neyronnyie-seti.jpg</file>
+        <file>Image/Neyronnyie-seti.jpg</file>
     </qresource>
 </RCC>

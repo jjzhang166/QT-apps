@@ -2,6 +2,7 @@
 #define CONFIGURATIONDIALOG_H
 
 #include <QDialog>
+#include <QFileDialog>
 #include "puzzlewidget.h"
 
 namespace Ui {
@@ -15,6 +16,7 @@ class ConfigurationDialog : public QDialog
 public:
     explicit ConfigurationDialog(QWidget *parent = 0);
     ~ConfigurationDialog();
+    QSize puzzleSize() const;
 
 private:
     Ui::ConfigurationDialog *ui;

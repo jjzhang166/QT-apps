@@ -2,6 +2,12 @@
 #define PUZZLEWIDGET_H
 #include <QFrame>
 #include <QObject>
+#include <QPainter>
+#include <QApplication>
+#include <QMouseEvent>
+#include <QPixmap>
+#include <QSize>
+#include <QPoint>
 
 
 class puzzleWidget : public QFrame
@@ -17,11 +23,22 @@ class puzzleWidget : public QFrame
     QSize m_maximum;
     QSize m_minimum;
     QPixmap m_preview;
+
+    void renderValue(QPainter* /*painter*/);
+    void renderGrid(QPainter* painter);
+
+    QSize cellSize() const;//const???
+    QPoint cellAt(QPoint &mp) const;
+
+
 public:
     puzzleWidget(QWidget *parent=0);
 
     QSize SizeHint() const;
-    void paintEvent(QPaintEvent *);
+    void paintEvent(QPaintEvent *event);
+
+    void mousePressEvent(QMouseEvent *event);
+    //void mouseMoveEvent(QMouseEvent);
 
     QSize value() {return m_size;}
     QSize minimum() {return m_minimum;}
@@ -35,7 +52,7 @@ public slots:
     void setPreview(const QPixmap& s);
 
 signals:
-    void valueChanged(const QSize& );
+    void valueChanged(const QSize& );// в moc_puzzlewidget.cpp описания сигнала выдавало ошибку, сделал кастомное изменение "&_t1"
     void heightChanged(int);
     void widthChanged(int);
 };
