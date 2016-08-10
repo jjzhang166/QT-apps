@@ -2,6 +2,7 @@
 #define CONFIGURATIONDIALOG_H
 
 #include <QDialog>
+#include "puzzlewidget.h"
 
 namespace Ui {
 class ConfigurationDialog;

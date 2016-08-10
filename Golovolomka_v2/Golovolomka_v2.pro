@@ -5,11 +5,13 @@ FORMS += \
 
 SOURCES += \
     main.cpp \
-    configurationdialog.cpp
+    configurationdialog.cpp \
+    puzzlewidget.cpp
 
 RESOURCES += \
     resource.qrc
 
 HEADERS += \
-    configurationdialog.h
+    configurationdialog.h \
+    puzzlewidget.h
 
