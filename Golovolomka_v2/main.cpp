@@ -12,8 +12,8 @@ int main(int argc, char *argv[])
     QGraphicsView gv;
     QGraphicsScene gs;
 
-    //gv.setScene(&gs);
-    //gv.show();
+    gv.setScene(&gs);
+    gv.show();
 
 
 

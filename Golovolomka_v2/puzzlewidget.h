@@ -38,6 +38,7 @@ public:
     void paintEvent(QPaintEvent *event);
 
     void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
     //void mouseMoveEvent(QMouseEvent);
 
     QSize value() {return m_size;}

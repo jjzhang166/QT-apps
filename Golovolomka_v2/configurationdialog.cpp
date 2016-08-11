@@ -18,7 +18,30 @@ void ConfigurationDialog::on_pushButton_clicked(bool checked)//почему bool
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open image"), QDir::currentPath(),/*"/home",*/ "Images (*.png *.xpm *.jpg)");
     ui->lineEdit->setText(fileName);
-    QPixmap pm;
-    pm.load(fileName);
-    ui->puzzleQidget->setPreview(pm);
+    QPixmap Pm;
+    Pm.load(fileName);
+    ui->puzzleQidget->setPreview(Pm);
+}
+
+QSize ConfigurationDialog::puzzleSize() const
+{
+    return ui->puzzleQidget->value();
+}
+
+QString ConfigurationDialog::imageFilePath() const
+{
+    return ui->lineEdit->text();
+}
+
+
+
+
+void ConfigurationDialog::on_buttonBox_accepted()
+{
+
+}
+
+void ConfigurationDialog::on_buttonBox_rejected()
+{
+
 }

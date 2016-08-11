@@ -17,7 +17,16 @@ void puzzleWidget::renderValue(QPainter *painter)
 
 void puzzleWidget::renderGrid(QPainter *painter)
 {
-
+    int xlength = cellSize().width();
+    int ylength = cellSize().height();
+    painter->setBrush((Qt::NoBrush));
+    for(int x = 0; x < maximum().width(); x++)
+    {
+        for(int y = 0; y < maximum().height(); y++)
+        {
+            painter->drawRect(x*xlength, y*ylength, xlength, ylength);
+        }
+    }
 }
 
 QSize puzzleWidget::cellSize() const
@@ -59,6 +68,14 @@ void puzzleWidget::paintEvent(QPaintEvent *event)
 }
 
 void puzzleWidget::mousePressEvent(QMouseEvent *event)
+{
+    QPoint mp = event->pos();
+    QPoint cell = cellAt(mp);
+    setValue(QSize(cell.x(),cell.y()));
+
+}
+
+void puzzleWidget::mouseMoveEvent(QMouseEvent *event)
 {
     QPoint mp = event->pos();
     QPoint cell = cellAt(mp);

@@ -16,11 +16,16 @@ class ConfigurationDialog : public QDialog
 public:
     explicit ConfigurationDialog(QWidget *parent = 0);
     ~ConfigurationDialog();
-    QSize puzzleSize() const;
+    QSize puzzleSize() const;// опять почему именно эти назначили конст
+    QString imageFilePath() const;
 
 private slots:
 
     void on_pushButton_clicked(bool checked);
+
+    void on_buttonBox_accepted();
+
+    void on_buttonBox_rejected();
 
 private:
     Ui::ConfigurationDialog *ui;
