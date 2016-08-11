@@ -18,6 +18,10 @@ public:
     ~ConfigurationDialog();
     QSize puzzleSize() const;
 
+private slots:
+
+    void on_pushButton_clicked(bool checked);
+
 private:
     Ui::ConfigurationDialog *ui;
 };
