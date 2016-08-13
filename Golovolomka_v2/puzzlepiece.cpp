@@ -18,6 +18,8 @@ PuzzlePiece::PuzzlePiece(ConnectorPosition north, ConnectorPosition south,
     m_coordinates = QPoint(0,0);
     m_neighbours[0] = 0;//1-4(разобраны)??
 
+    m_image.load(":/Image/Neyronnyie-seti.jpg");
+    update();
 }
 
 void PuzzlePiece::constructPath(QPainterPath &p)
@@ -67,4 +69,15 @@ void PuzzlePiece::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     painter->setPen(Qt::black);
     painter->drawPath(path());
 
+}
+
+QPixmap PuzzlePiece::pixmap()
+{
+    return m_image;
+}
+
+void PuzzlePiece::setPixmap(const QPixmap& image)
+{
+    m_image = image;
+    update();
 }

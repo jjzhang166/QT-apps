@@ -3,6 +3,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include "puzzlepiece.h"
+#include <QRect>
 
 int main(int argc, char *argv[])
 {
@@ -14,6 +15,11 @@ int main(int argc, char *argv[])
     QGraphicsScene gs;
 
     PuzzlePiece item(PuzzlePiece::None, PuzzlePiece::Out, PuzzlePiece::In, PuzzlePiece::Out);
+
+    int cellSize = PIECE_SIZE;
+    QRect rect = item.boundingRect().toRect();
+    rect.translate(0.5 * cellSize + cellSize, 0.5 * cellSize + 5 * cellSize);
+
 
     gs.addItem(&item);
 
