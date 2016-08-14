@@ -7,7 +7,8 @@ SOURCES += \
     main.cpp \
     configurationdialog.cpp \
     puzzlewidget.cpp \
-    puzzlepiece.cpp
+    puzzlepiece.cpp \
+    logic.cpp
 
 RESOURCES += \
     resource.qrc
@@ -15,5 +16,6 @@ RESOURCES += \
 HEADERS += \
     configurationdialog.h \
     puzzlewidget.h \
-    puzzlepiece.h
+    puzzlepiece.h \
+    logic.h
 

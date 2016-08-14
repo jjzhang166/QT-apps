@@ -17,6 +17,10 @@ PuzzlePiece::PuzzlePiece(ConnectorPosition north, ConnectorPosition south,
 
     m_coordinates = QPoint(0,0);
     m_neighbours[0] = 0;//1-4(разобраны)??
+    m_neighbours[1] = 0;
+    m_neighbours[2] = 0;
+    m_neighbours[3] = 0;
+
 
     m_image.load(":/Image/Neyronnyie-seti.jpg");
     update();

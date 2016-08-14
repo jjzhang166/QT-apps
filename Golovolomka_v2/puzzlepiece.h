@@ -14,7 +14,7 @@
 #include <QSize>
 #include <QPoint>
 
-#define PIECE_SIZE 100
+#define PIECE_SIZE 50
 
 class PuzzlePiece : public QGraphicsPathItem
 {
