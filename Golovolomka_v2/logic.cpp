@@ -38,8 +38,8 @@ void Logic::setup(QSize ImageSize, /*QSize PuzzleSize,*/ QString FileName)
             curr[3] = qrand() % 2 ? PuzzlePiece::In : PuzzlePiece::Out;
             curr[1] = qrand() % 2 ? PuzzlePiece::In : PuzzlePiece::Out;
             curr[2] = reverse(storedWest);
-            if (col==ImageSize.width()-1) curr[1]= PuzzlePiece::None;
-            if (row==ImageSize.height()-1) curr[2]= PuzzlePiece::None;
+            if (col==ImageSize.width()-1) curr[3]= PuzzlePiece::None;
+            if (row==ImageSize.height()-1) curr[1]= PuzzlePiece::None;
 
             PuzzlePiece *piece = new PuzzlePiece(curr[0], curr[1], curr[2], curr[3]);
 
@@ -47,8 +47,8 @@ void Logic::setup(QSize ImageSize, /*QSize PuzzleSize,*/ QString FileName)
             piece->setFlag(QGraphicsItem::ItemIsMovable);
             piece->setPos(col*100, row*100); // put the piece in place
 
-            storedWest = curr[1]; // store east for next column
-            prev[col] = curr[2]; // store south for next row
+            storedWest = curr[3]; // store east for next column
+            prev[col] = curr[1]; // store south for next row
 
 
             QRect rect = piece->boundingRect().toRect(); // (0,0) в центре
