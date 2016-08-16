@@ -10,7 +10,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     ConfigurationDialog dlg;
-    dlg.show();
+    dlg.exec();
+    //dlg.show();
 
     QGraphicsView gv;
     QGraphicsScene gs;
