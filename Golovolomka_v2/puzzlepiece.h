@@ -15,6 +15,7 @@
 #include <QPoint>
 #include <QGraphicsView>
 #include <QMessageBox>
+#include "configurationdialog.h"
 
 #define PIECE_SIZE 50
 
@@ -22,6 +23,7 @@ class PuzzlePiece : public QGraphicsPathItem
 {
 public:
 
+    int exitFlag = 0;
 
     enum ConnectorPosition {None, In, Out};
 

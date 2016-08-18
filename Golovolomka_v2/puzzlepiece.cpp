@@ -170,7 +170,10 @@ void PuzzlePiece::findneighbor(PuzzlePiece::Direction direction)
 
 void PuzzlePiece::checkNeighbours(QList<QPoint> &checked)
 {
-    if (checked.count()==this->scene()->items().count())
+    /*int h = ConfigurationDialog.puzzleSize().height();
+    int w = ConfigurationDialog.puzzleSize().width();
+    int NumberOfElements = h*w;*/
+    if (checked.count()== /*NumberOfElements*/this->scene()->items().count())
     {
         QMessageBox* pmbx =
                             new QMessageBox("Победа",
@@ -180,11 +183,18 @@ void PuzzlePiece::checkNeighbours(QList<QPoint> &checked)
                             QMessageBox::No,
                             QMessageBox::Cancel | QMessageBox::Escape);
         int n = pmbx->exec();
-        delete pmbx;
+
+        //delete pmbx;
         if (n == QMessageBox::No)
         {
-          pmbx->close();
+            qApp->quit();
         }
+        if (n == QMessageBox::Yes)
+        {
+            pmbx->close();
+
+        }
+
     }
 
     if(checked.contains(coordinates()))   return; // условия прерывания рекурсии
