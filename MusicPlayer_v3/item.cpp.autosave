@@ -1,0 +1,62 @@
+#include "item.h"
+
+Item::Item()
+{
+    m_parent = 0;
+}
+Item::~Item()
+{
+    SetParent(0);
+    foreach (Item *child, m_children)
+    {
+        try
+        {
+            delete(child);
+        }
+        catch(...){}
+    }
+
+}
+
+void Item::insertChild(Item *p, int pos)//rough version
+{
+    m_children.insert(pos, p);
+    p->setParent(this);
+    /*QSet<QString> set = m_children.toSet();
+    m_children = set.toList();*/
+    /*if (m_children.contains(p))
+        p->setParent(this);
+    else
+    {
+        if (pos<0 || pos>m_children.size())
+            m_children.insert(m_children.size(), p);
+        else
+            m_children.insert(pos, p);
+        p->setParent(this);
+    }*/
+}
+
+Item *Item::takeChild(int pos)//WARNING
+{
+    Item *p=m_children.takeAt(pos);
+    try
+    {
+        p->setParent(0);
+        return p;
+    }
+    catch(...){qWarning() << "No pointer catched ";}
+}
+
+void Item::setParent(Item *p)
+{
+    if (p)
+    {
+        if (m_parent)
+        {            
+            m_parent->takeChild(m_parent->indexOf(this));
+        }
+        m_parent=p;
+        m_parent->insertChild(this);
+    }   
+}
+
