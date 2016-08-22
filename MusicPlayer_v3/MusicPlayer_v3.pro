@@ -14,9 +14,15 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    item.cpp
+    item.cpp \
+    musicmodel_v3.cpp \
+    musicmodel.cpp \
+    ratingdelegate.cpp
 
 HEADERS  += mainwindow.h \
-    item.h
+    item.h \
+    musicmodel_v3.h \
+    musicmodel.h \
+    ratingdelegate.h
 
 FORMS    += mainwindow.ui
