@@ -1,115 +1,20 @@
 #include "item.h"
 
+
 Item::Item()
 {
-    m_parent = 0;
-}
-
-Item::Item(QString name, Item *parent)
-{ qDebug()<<QString("create item")<<name; // не логгится
-    m_name=name;
-    m_parent=parent;
+    m_parent=0;
+    m_name=QString("");
+    m_comment=QString("");
 }
 
 Item::~Item()
 {
-    //qDebug()<<QString("deleting item");
     setParent(0);
-    foreach (Item *child, m_children)
+    foreach (Item* child,m_children)
     {
-        try
-        {
-            delete(child);
-        }
-        catch(...){}
+        if (child) delete child;
     }
-
-}
-
-void Item::insertChild(Item *p, int position)//rough version
-{
-    m_children.insert(position, p);
-    p->setParent(this);
-    /*QSet<QString> set = m_children.toSet();
-    m_children = set.toList();*/
-    /*if (m_children.contains(p))
-        p->setParent(this);
-    else
-    {
-        if (position<0 || position>m_children.size())
-            m_children.insert(m_children.size(), p);
-        else
-            m_children.insert(position, p);
-        p->setParent(this);
-    }*/
-}
-
-Item *Item::takeChild(int position)//WARNING
-{
-    Item *p=m_children.takeAt(position);
-    try
-    {
-        p->setParent(0);
-        return p;
-    }
-    catch(...){/*qWarning() << "No pointer catched ";*/}
-}
-
-void Item::setParent(Item *Parent)// check
-{
-    if (Parent)
-    {
-        if (m_parent)// disconnect
-        {
-            m_parent->takeChild(m_parent->indexOf(this));
-        }
-        m_parent=Parent;//connect
-        m_parent->insertChild(this);
-    }
-}
-
-int Item::indexOf(Item *item) const// type of m_children consistents?
-{
-    if(m_children.contains(item))
-    {
-        return m_children.indexOf(item);
-    }
-    else
-    {
-        return NULL;
-    }
-}
-
-Item *Item::childAt(int position) const
-{
-    if ( position>m_children.size() || position<0)
-        return NULL;
-    Item *p=m_children.at(position);
-    return p;
-}
-
-QString Item::name() const
-{
-    return m_name;
-}
-
-QString Item::comment() const
-{
-    return m_comment;}
-
-void Item::setName(const QString &name)
-{
-    m_name = name;
-}
-
-void Item::setComment(const QString &name)
-{
-    m_comment = name;
-}
-
-int Item::childCount() const
-{
-    return m_children.count();
 }
 
 Item *Item::parent() const
@@ -117,150 +22,114 @@ Item *Item::parent() const
     return m_parent;
 }
 
-//////////////////// ARTIST //////////////////////////
-
-Artist::Artist(QString name, Item *parent) : Item(name)
+Item::Item(QString name, Item *parent)
 {
-    setParent(parent);
-    m_photo=QPixmap();
-    m_country=QString();
-    m_albums=QList<Album*>();
+    m_parent=parent;
+    m_name=name;
+    m_comment=QString("");
+
 }
 
-QPixmap Artist::photo() const
+void Item::setParent(Item *p)
 {
-    return m_photo;
+    if (m_parent==p)
+        return;
+    if (p)
+    {
+        if(m_parent)
+        {
+            m_parent->takeChild(m_parent->indexOf(p));
+        }
+        m_parent=p;
+        m_parent->insertChild(this);
+    }
 }
 
-QString Artist::country() const
+void Item::insertChild(Item *p, int pos)
 {
-    return m_country;
+    if (!p) return;
+    if(m_children.contains(p))
+        p->setParent(this);
+    else
+    {
+        if(pos<0||pos>m_children.size())
+            m_children.insert(m_children.size(),p);
+        else
+            m_children.insert(pos,p);
+        p->setParent(this);
+    }
 }
 
-QList<Album*> Artist::albums() const
+Item *Item::takeChild(int pos)
 {
-    return m_albums;
+    Item* p=m_children.takeAt(pos);
+    if (p)
+        p->setParent(0);
+    qDebug()<<QString("CHECK 1!!")<<p->m_name<<" to item "<<m_name<<" at pos "<<pos;
+    return p;
 }
 
-void Artist::setAlbums(QList<Album *> &albums)
+Item *Item::childAt(int pos) const
 {
-    m_albums = albums;
+    if(pos<0||pos>m_children.size())
+        return 0;
+    Item* p=m_children.at(pos);
+    qDebug()<<QString("KTO ETO")<<pos;
+
+    return p;
 }
 
-void Artist::setPhoto(const QPixmap &photo)
+int Item::indexOf(Item *item) const
 {
-    m_photo = photo;
+    return m_children.indexOf(item,0);
 }
 
-void Artist::setCountry(const QString &country)
+int Item::childCount() const
 {
-    m_country = country;
+    return m_children.count();
 }
 
-//////////////////// ALBUM ///////////////////////////
-
-Album::Album(QString name, Item *parent) : Item(name)
+bool Item::insertChildren(int pos, int count)
 {
-    setParent(parent);
-    m_year=0;
-    m_cover=QPixmap();
-    m_genre= QString();
-    m_songs=QList<Song*>();
-    m_artist=NULL;
+    if (pos < 0 || pos > m_children.size())
+        return false;
+
+    for (int row = 0; row < count; ++row) {
+        QString data;
+        Item *item = new Item(data,this);
+        m_children.insert(pos, item);
+    }
+
+    return true;
 }
 
-int Album::year() const
+bool Item::removeChildren(int pos, int count)
 {
-    return m_year;
+    if (pos < 0 || pos + count > m_children.size())
+        return false;
+
+    for (int row = 0; row < count; ++row)
+        delete m_children.takeAt(pos);
+
+    return true;
 }
 
-QPixmap Album::cover() const
+
+void Item::setName(QString name)
 {
-    return m_cover;
+    m_name=name;
 }
 
-QString Album::genre() const
+
+void Item::setComment(QString comment)
 {
-    return m_genre;
+    m_comment=comment;
 }
 
-QList<Song*> Album::songs() const
+int Item::colomnCount()
 {
-    return m_songs;
+    return 4;
 }
-
-Artist* Album::artist() const
-{
-    return m_artist;
-}
-
-void Album::setYear(const int &year)
-{
-    m_year = year;
-}
-
-void Album::setCover(const QPixmap &cover)
-{
-    m_cover = cover;
-}
-
-void Album::setGenre(const QString &genre)
-{
-    m_genre = genre;
-}
-
-void Album::setSongs(QList<Song*> &songs)
-{
-    m_songs = songs;
-}
-
-void Album::setArtist(Artist *&artist)
-{
-    m_artist = artist;
-}
-
-/////////////////// SONG //////////////////////////////
-
-Song::Song(QString name, Item *parent) : Item(name)
-{
-    setParent(parent);
-    m_rating=0;
-    m_duration=QTime::currentTime();
-    m_album=NULL;
-    m_rating=0;
-}
-
-int Song::rating() const
-{
-    return m_rating;
-}
-
-QTime Song::duration() const
-{
-    return m_duration;
-}
-
-Album *Song::album() const
-{
-    return m_album;
-}
-
-void Song::setDuration(const QTime &duration)
-{
-    m_duration = duration;
-}
-
-void Song::setRating(const int &rating)
-{
-    m_rating = rating;
-}
-
-void Song::setAlbum(Album* &album)
-{
-    m_album = album;
-}
-
-////////////////
 
 Artist *Item::toArtist()
 {
@@ -277,34 +146,9 @@ Song *Item::toSong()
     return NULL;
 }
 
-Artist *Artist::toArtist()
+Song::Song():Item()
 {
-    return this;
-}
-
-Album *Artist::toAlbum()
-{
-    return NULL;
-}
-
-Song *Artist::toSong()
-{
-    return NULL;
-}
-
-Artist *Album::toArtist()
-{
-    return NULL;
-}
-
-Album *Album::toAlbum()
-{
-    return this;
-}
-
-Song *Album::toSong()
-{
-    return NULL;
+    m_rating=0;
 }
 
 Artist *Song::toArtist()
@@ -317,86 +161,163 @@ Album *Song::toAlbum()
     return NULL;
 }
 
-Song *Song::toSong()
+Song* Song::toSong() { return this; }
+
+int Song::colomnCount()
+{
+    return 1;
+}
+
+void Song::setDuration(QTime time)
+{
+    m_duration= time;
+}
+
+void Song::setRating(int rating)
+{
+    m_rating = rating;
+}
+
+
+
+Album::Album():Item()
+{
+
+}
+
+Artist *Album::toArtist()
+{
+    return NULL;
+}
+
+Album* Album::toAlbum()
 {
     return this;
 }
 
-////////////// SERIALIZATION ////////////////////
-/// \brief operator <<
-/// \param stream
-/// \param song
-/// \return
-///
-QDataStream & operator<<(QDataStream &stream, Song &song)
+Song *Album::toSong()
 {
-    stream<<"passing the song unit"<<song.name()<<song.duration()<<song.rating()<<song.comment();
-    //stream<<song.name()<<song.duration()<<song.rating()<<song.comment();
-    return stream;
+    return NULL;
 }
 
-QDataStream & operator>>(QDataStream &stream, Song &song)
+int Album::colomnCount()
 {
-    QString name;
-    QTime duration;
-    int rating;
-    QString comment;
-    stream >> name >> duration >> rating >> comment;
-    song.setName(name);
-    song.setDuration(duration);
-    song.setRating(rating);
-    song.setComment(comment);
-    return stream;
+    return 3;
 }
 
-QDataStream & operator<<(QDataStream &stream, Artist &artist)
+void Album::setCover(QPixmap cover)
 {
-    stream << "passing artist unit";//<<artist.name()<<artist.photo()<<artist.country()<<artist.comment();
-    stream<<artist.name()<<artist.photo()<<artist.country()<<artist.comment();
+    m_cover = cover;
+}
+
+void Album::setYear(int year)
+{
+    m_year = year;
+}
+
+void Album::setGenre(QString genre)
+{
+    m_genre = genre;
+}
+
+
+Artist::Artist():Item()
+{
+
+}
+
+Artist* Artist::toArtist() { return this; }
+
+Album *Artist::toAlbum()
+{
+    return NULL;
+}
+
+Song *Artist::toSong()
+{
+    return NULL;
+}
+
+int Artist::colomnCount()
+{
+    return 1;
+}
+
+void Artist::setPhoto(QPixmap photo)
+{
+    m_photo=photo;
+}
+
+void Artist::setCountry(QString country)
+{
+    m_country=country;
+}
+QDataStream& operator <<(QDataStream &stream, Artist &artist) {
+  // stream << "ARTIST";
+    stream << artist.m_name << artist.m_photo << artist.m_comment << artist.m_country;
+
     int cnt = artist.childCount();
     stream << cnt;
-    for(int i=0; i<cnt; ++i)
-    {
+    for(int i=0; i<cnt; ++i){
         Album *album = artist.childAt(i)->toAlbum();
-        if(album)
-        {
-             stream << *album;
-        }
+        if(album) {
+            stream << *album; }
     }
     return stream;
 }
 
-QDataStream & operator>>(QDataStream &stream, Artist &artist)
-{
-    QString name;
-    QPixmap photo;
-    QString country;
-    QString comment;
-    stream >> name >> photo >> country >> comment;
-    artist.setName(name);
-    artist.setPhoto(photo);
-    artist.setCountry(country);
-    artist.setComment(comment);
-    return stream;
-}
 
-QDataStream & operator<<(QDataStream &stream, Album &album)
-{
-    stream << "ALBUM";
-    stream<<album.name()<<album.year()<<album.cover()<<album.genre()<<album.comment();
+
+QDataStream& operator <<(QDataStream &stream, Album &album) {
+  // stream << "ALBUM";
+    stream << album.m_name << album.m_cover<< album.m_comment << album.m_year << album.m_genre;
+
     int cnt = album.childCount();
     stream << cnt;
-    for(int i=0; i<cnt; ++i)
-    {
+    for(int i=0; i<cnt; ++i){
         Song *song = album.childAt(i)->toSong();
-        if(song)
-        {
-             stream << *song;
-        }
+        if(song) {
+            stream << *song; }
     }
     return stream;
 }
 
-QDataStream & operator>>(QDataStream &stream, Album &album);
+QDataStream& operator <<(QDataStream &stream, Song &song) {
+    //stream << "SONG";
+    stream << song.m_name << song.m_duration << song.m_comment << song.m_rating;
 
-QDataStream & operator<<(QDataStream &stream, Item &root);
+    return stream;
+}
+
+QDataStream& operator << (QDataStream &stream, Item &root)
+{
+    int cnt = root.childCount();
+    stream << cnt;
+    for(int i=0; i<cnt; ++i){
+        Artist *artist = root.childAt(i)->toArtist();
+        if(artist) {
+            stream << *artist; }
+    }
+    return stream;
+}
+
+QDataStream& operator >>(QDataStream &stream, Artist &artist) {
+
+    stream >>artist.m_name >> artist.m_photo >> artist.m_comment >> artist.m_country;
+
+    return stream;
+}
+
+QDataStream& operator >>(QDataStream &stream, Album &album) {
+
+    stream >>album.m_name >> album.m_cover >> album.m_comment >> album.m_year >> album.m_genre;
+
+    return stream;
+}
+
+QDataStream& operator >>(QDataStream &stream, Song &song) {
+
+    stream >> song.m_name >> song.m_duration>> song.m_comment >> song.m_rating;
+
+    return stream;
+}

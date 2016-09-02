@@ -1,154 +1,105 @@
 #include "musicmodel.h"
-
-musicmodel::musicmodel(QObject *parent)
-    : QAbstractItemModel(parent)
+#include "albumdialog.h"
+#include "artistdialog.h"
+MusicModel::MusicModel()
 {
     m_root = new Item();
     Artist *artist = new Artist();
     m_root->insertChild(artist,0);
-
-    Artist* artist1=new Artist("name", m_root);
-    Album *album1 =new Album("name", artist1->parent());
 }
 
-QVariant musicmodel::headerData(int section, Qt::Orientation orientation, int role) const
+MusicModel::~MusicModel()
 {
-    if (orientation==Qt::Horizontal && role==Qt::DisplayRole)
-    {
-        switch (section)
-        {
-        case 0:
-            return QObject::tr("Трек");
-            break;
-        case 1:
-            return QObject::tr("Продолжительность");
-            break;
-        case 2:
-            return QObject::tr("Рейтинг");
-            break;
-        case 3:
-            return QObject::tr("Заметка");
-            break;
-        default:
-            return QVariant();
-            break;
-        }
-    }
-    return QVariant();
+    if(m_root)
+        delete m_root;
+    m_root=0;
 }
 
-/*bool musicmodel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
+QModelIndex MusicModel::index(int row, int column, const QModelIndex &parent) const
 {
-    if (orientation==Qt::Horizontal && role==Qt::DisplayRole)
-    {
-        switch (section)
-        {
-        case 0:
-            return QObject::tr("Трек");
-            break;
-        case 1:
-            return QObject::tr("Продолжительность");
-            break;
-        case 2:
-            return QObject::tr("Рейтинг");
-            break;
-        case 3:
-            return QObject::tr("Заметка");
-            break;
-        default:
-            return QVariant();
-            break;
-        }
-    }
-    return QVariant();
-}*/
-
-QModelIndex musicmodel::index(int row, int column, const QModelIndex &parent) const
-{
-    Item *parentItem=m_root;
+    Item* parentItem=m_root;
     if (parent.isValid())
     {
-        parentItem=static_cast<Item *>(parent.internalPointer());
+        parentItem=static_cast<Item*>(parent.internalPointer());
     }
-
-    if ((row<parentItem->childCount())&&((parentItem->toArtist() && column==0)||(parentItem==m_root && column < 1)||(parentItem->toAlbum() && column < 5)))
-            return createIndex(row, column, parentItem->childAt(row));
-    return QModelIndex();
-}
-
-QModelIndex musicmodel::parent(const QModelIndex &child) const
-{
-    Item *childItem=0;
-    if (child.isValid())
-    {
-        childItem=static_cast<Item *>(child.internalPointer());
-    }
-    else return QModelIndex();
-    if (!childItem)
-        return QModelIndex();
-    Item *parentItem=childItem->parent();
-    if (parentItem)
-    {
-        Item *grandItem=parentItem->parent();
-        if (grandItem)
-        {
-            return createIndex(grandItem->indexOf(parentItem), child.column(), parentItem);
-        }
-        else
-            return createIndex(m_root->indexOf(parentItem), child.column(), m_root);
-    }
+    qDebug()<<row;
+    qDebug()<<column;
+    if (  parentItem->m_children.value(row))
+    return createIndex(row, column, parentItem->childAt(row));
     else
         return QModelIndex();
 }
 
-int musicmodel::rowCount(const QModelIndex &parent) const
+QModelIndex MusicModel::parent(const QModelIndex &child) const
 {
-    Item *parentItem=NULL;
-    if (parent.isValid()) parentItem = static_cast<Item*>(parent.internalPointer());
-    else return 4;
+    if(!child.isValid())
+    {
+        return QModelIndex();
+    }
+    Item *item = static_cast<Item*>(child.internalPointer());
+    if(item == m_root)
+        return QModelIndex();
+    Item *parentItem = item->parent();
+    if(parentItem == m_root)
+        return QModelIndex();
 
-    if (parentItem->toAlbum()) return 3;
-    if (parentItem->toArtist()) return 1;
-    if (parentItem->toSong()) return 1;
-
-    return 4;
+    Item *grandItem = parentItem->parent();
+    if(!grandItem)
+        return QModelIndex();
+    else
+        return createIndex(grandItem->indexOf(parentItem),
+                           0,(void*)parentItem);
 }
 
-int musicmodel::columnCount(const QModelIndex &parent) const
+int MusicModel::columnCount(const QModelIndex &parent) const
 {
-    if (!parent.isValid())
-        return 0;
-
-    // FIXME: Implement me!
+       return 4;
 }
 
-QVariant musicmodel::data(const QModelIndex &index, int role) const
+int MusicModel::rowCount(const QModelIndex &parent) const
+{
+    Item* parentItem=m_root;
+    if(parent.isValid())
+        parentItem=static_cast<Item*>(parent.internalPointer());
+    return parentItem->childCount();
+}
+
+QVariant MusicModel::data(const QModelIndex &index, int role) const
 {
     Item *item=m_root;
-    if (index.isValid())
-        item=static_cast<Item *>(index.internalPointer());
-    else
-        return QVariant();
-    switch (role)
-    {
+    if(index.isValid())
+        item=static_cast<Item*>(index.internalPointer());
+    else return QVariant();
+
+    switch(role)  {
     case Qt::DisplayRole:
-        switch (index.column())
-        {
+        switch(index.column()){
+
         case 0:
-            return item->name();
-            break;
+        return item->m_name;
+        break;
+
         case 1:
-            return item->toSong()->duration();
+            if(item->toSong()){
+           return item->toSong()-> m_duration;}
+            return "";
+
             break;
         case 2:
-            return item->toSong()->rating();
+            if(item->toSong()){
+            return item->toSong()->m_rating;}
+            return "";
+
             break;
         case 3:
-            return item->comment();
+            if(item->toSong()){
+            return  item->toSong()->m_comment;}
+            return "";
             break;
         default:
             break;
         }
+
         break;
     default:
         break;
@@ -156,85 +107,94 @@ QVariant musicmodel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool musicmodel::setData(const QModelIndex &index, const QVariant &value, int role)
+QVariant MusicModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    /*if (data(index, role) != value) {
-        // FIXME: Implement me!
-        emit dataChanged(index, index, QVector<int>() << role);
-        return true;
+    if(orientation==Qt::Horizontal && role==Qt::DisplayRole){
+        switch(section){
+        case 0: return QObject::tr("Track");
+         case 1: return QObject::tr("Duratiob");
+            case 2: return QObject::tr("Rating");
+            case 3: return QObject::tr("Notes");
+        default:
+            break;
+        }
     }
-    return false;*/
+    return QVariant();
+}
+
+Qt::ItemFlags MusicModel::flags(const QModelIndex &index) const
+{
+    if (!index.isValid())
+             return 0;
+
+    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+}
+
+bool MusicModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+
+
     if (index.isValid() && (role == Qt::EditRole || role ==Qt::DisplayRole))
     {
-        if (index.column() == 0 && value.canConvert(QMetaType::QString))
-          static_cast<Item*>(index.internalPointer())->setName(value.toString());
+        if(index.column() == 0)
+            static_cast<Item*>(index.internalPointer())->setName(value.toString());
         if(static_cast<Song*>(index.internalPointer())->toSong())
         {
-            if(index.column() == 1 && value.canConvert(QMetaType::QTime))
-              static_cast<Song*>(index.internalPointer())->setDuration(value.toTime());
-            if(index.column() == 2 && value.canConvert(QMetaType::Int))
-              static_cast<Song*>(index.internalPointer())->setRating(value.toInt());
-            if(index.column() == 3 && value.canConvert(QMetaType::QString))
-              static_cast<Song*>(index.internalPointer())->setComment(value.toString());
-        }
 
+            if(index.column() == 1)
+                static_cast<Song*>(index.internalPointer())->setDuration(value.toTime());
+            if(index.column() == 2)
+
+                static_cast<Song*>(index.internalPointer())->setRating(value.toInt());
+            if(index.column() == 3)
+                static_cast<Song*>(index.internalPointer())->setComment(value.toString());
+        }
         emit dataChanged(index, index);
         return true;
     }
     return false;
 }
 
-Qt::ItemFlags musicmodel::flags(const QModelIndex &index) const
+bool MusicModel::insertRows(int row, int count, const QModelIndex &parent)
 {
-    if (index.isValid()) return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
-    return 0;
-}
+    Item *parentItem;
+    if(parent.isValid())
+        parentItem = static_cast<Item*>(parent.internalPointer());
+    else parentItem=m_root;
 
-bool musicmodel::insertRows(int row, int count, const QModelIndex &parent)
-{
-    Item *parentItem=m_root;
-    if (parent.isValid()) parentItem=static_cast<Item *>(parent.internalPointer());
-    for (int i=row; i<=row+count-1;i++)
+    for ( int i = row; i <= (row + count - 1); i++ )
     {
-        Item *tmp;
-        if (parentItem->toAlbum()) tmp = new Song();
-        else
-            if (parentItem->toArtist()) tmp = new Album();
-        else
-            if (parentItem==m_root) tmp = new Artist();
+
+        Item* item;
+        if(parentItem==m_root)
+            item = new Artist();
+        if(parentItem->toArtist())
+            item = new Album();
+        if(parentItem->toAlbum())
+            item = new Song();
         beginInsertRows(parent, row, row+count-1);
-        parentItem->insertChild(tmp, i);
+        parentItem->insertChild(item, i);
         endInsertRows();
     }
+
     return true;
 }
 
-bool musicmodel::insertColumns(int column, int count, const QModelIndex &parent)
+bool MusicModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-    beginInsertColumns(parent, column, column + count - 1);
-    // FIXME: Implement me!
-    endInsertColumns();
+    Item *parentItem;
+    if(parent.isValid())
+        parentItem = static_cast<Item*>(parent.internalPointer());
+    else parentItem=m_root;
+
+        for ( int i = (row + count - 1); i >= row; i-- )
+        {
+            QModelIndex child = index(i, 0, parent);
+            removeRows(0, rowCount(child), child);
+            beginRemoveRows(parent, 0, 0);
+            parentItem->takeChild(i);
+            endRemoveRows();
+        }
+        return true;
 }
 
-bool musicmodel::removeRows(int row, int count, const QModelIndex &parent)
-{
-    Item *parentItem=m_root;
-    if (parent.isValid()) parentItem=static_cast<Item *>(parent.internalPointer());
-    for (int i=(row+count-1); i>=row;i--)
-    {
-        QModelIndex tmp = index(i, 0, parent);
-        removeRows(0, rowCount(tmp), tmp);
-
-        beginRemoveRows(parent, 0, 0);
-        parentItem->takeChild(i);
-        endRemoveRows();
-    }
-    return true;
-}
-
-bool musicmodel::removeColumns(int column, int count, const QModelIndex &parent)
-{
-    beginRemoveColumns(parent, column, column + count - 1);
-    // FIXME: Implement me!
-    endRemoveColumns();
-}

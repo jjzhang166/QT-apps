@@ -1,126 +1,104 @@
 #ifndef ITEM_H
 #define ITEM_H
-#include <QList>
-#include <QString>
-#include <QSet>
-#include <QDebug>
+
+#include <QMainWindow>
+#include <QtGui>
 #include <QPixmap>
 #include <QTime>
-#include <QFile>
+#include <QtGlobal>
 #include <QDataStream>
+#include <QTreeView>
+#include <QStyledItemDelegate>
+#include <QSize>
+#include <QAbstractItemView>
+#include <QTreeWidgetItem>
+#include <QMouseEvent>
 
-class Artist;
 class Album;
 class Song;
-
-class Item
-{
+class Artist;
+class Item {
 public:
     Item();
-    Item(QString name,Item* parent=0);
     ~Item();
     Item *parent() const;
-    void setParent(Item *Parent);
-    void insertChild(Item *, int position = -1);
-    Item *takeChild(int position);
-    Item *childAt(int position) const;
+    Item(QString name,Item* parent=0);
+    void setParent(Item *p);
+    void insertChild(Item *p, int pos = -1);
+    Item* takeChild(int pos);
+    Item *childAt(int pos) const;
     int indexOf(Item* item) const;
     int childCount() const;
-    QString name() const;
-    QString comment() const;
-    void setName(const QString &name);
-    void setComment(const QString &name);
+    bool insertChildren(int position, int count);
+    bool removeChildren(int position, int count);
+    void setName(QString name);
+    void setComment(QString comment);
+    virtual int colomnCount();
     virtual Artist* toArtist();
     virtual Album* toAlbum();
     virtual Song* toSong();
-private:
-    Item *m_parent;
     QList<Item*> m_children;
     QString m_name;
+
     QString m_comment;
+private:
+    Item *m_parent;
+
 };
-////////////////////// ARTIST ///////////////////////
+
 class Artist : public Item
 {
 public:
-    Artist() : Item()
-    {}//" ; " ЛИШНЕЕЕЕ???
-    Artist(QString name, Item *parent=0);
-    QString country() const;
-    QPixmap photo() const;
-    QList<Album*> albums() const;
-    void setPhoto(const QPixmap &photo);
-    void setCountry(const QString &country);
-    void setAlbums(QList<Album *> &albums);
+    Artist();
     Artist* toArtist();
     Album* toAlbum();
     Song* toSong();
-private:
+    int colomnCount();
+    void setPhoto(QPixmap photo);
+    void setCountry(QString country);
+
     QPixmap m_photo;
     QString m_country;
-    QList<Album*> m_albums;
 };
-///////////////////// ALBUM ////////////////////////
+
 class Album : public Item
 {
 public:
-    Album() : Item()
-    {}//" ; " ЛИШНЕЕЕЕ???
-    Album(QString name, Item *parent=0);
-    int year() const;
-    QPixmap cover() const;
-    QString genre() const;
-    QList<Song*> songs() const;
-    Artist* artist() const;
-    void setYear(const int &year);
-    void setCover(const QPixmap &cover);
-    void setGenre(const QString &genre);
-    void setSongs(QList<Song*> &songs);
-    void setArtist(Artist *&artist);
+    Album();
     Artist* toArtist();
     Album* toAlbum();
     Song* toSong();
-private:
-    int m_year;
+    int colomnCount();
+    void setCover(const QPixmap cover);
+    void setYear(int year);
+    void setGenre(QString genre);
+
     QPixmap m_cover;
+    int m_year;
     QString m_genre;
-    QList<class Song*> m_songs;
-    class Artist *m_artist;
 };
-////////////////// SONG ////////////////////
+
 class Song : public Item
 {
 public:
-    Song() : Item()
-    {}//" ; " ЛИШНЕЕЕЕ???
-    Song(QString name, Item *parent=0);
-    QTime duration() const;
-    int rating() const;
-    Album* album() const;
-    void setRating(const int &rating);
-    void setDuration(const QTime &duration);
-    void setAlbum(Album* &album);
+    Song();
     Artist* toArtist();
     Album* toAlbum();
     Song* toSong();
-private:
+    int colomnCount();
+    void setDuration(QTime time);
+    void setRating(int rating);
     int m_rating;
+
     QTime m_duration;
-    Album *m_album;
+
 };
-
-QDataStream & operator<<(QDataStream &stream, Song &song);
-QDataStream & operator>>(QDataStream &stream, Song &song);
-
-QDataStream & operator<<(QDataStream &stream, Artist &artist);
-QDataStream & operator>>(QDataStream &stream, Artist &artist);
-
-QDataStream & operator<<(QDataStream &stream, Album &album);
-QDataStream & operator>>(QDataStream &stream, Album &album);
-
-QDataStream & operator<<(QDataStream &stream, Item &root);
-
-
-
-
+QDataStream& operator <<(QDataStream &stream, Item &root);
+QDataStream& operator <<(QDataStream &stream, Artist &artist);
+QDataStream& operator >>(QDataStream &stream, Artist &artist);
+QDataStream& operator <<(QDataStream &stream, Album &album);
+QDataStream& operator <<(QDataStream &stream, Song &song);
+QDataStream& operator >>(QDataStream &stream, Album &album);
+QDataStream& operator >>(QDataStream &stream, Song &song);
 #endif // ITEM_H
+

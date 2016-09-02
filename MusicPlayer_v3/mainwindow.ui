@@ -14,16 +14,11 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QTreeView" name="treeView">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>20</y>
-      <width>256</width>
-      <height>192</height>
-     </rect>
-    </property>
-   </widget>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QTreeView" name="treeView"/>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -34,6 +29,31 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="action_open"/>
+    <addaction name="action_Save"/>
+    <addaction name="action_Save_As"/>
+   </widget>
+   <widget class="QMenu" name="menuAdd">
+    <property name="title">
+     <string>Add/&amp;delete</string>
+    </property>
+    <addaction name="action_new_artist"/>
+    <addaction name="action_new_album"/>
+    <addaction name="action_new_song"/>
+    <addaction name="action_delete"/>
+   </widget>
+   <widget class="QMenu" name="menuView_Edit">
+    <property name="title">
+     <string>View/Edit</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuAdd"/>
+   <addaction name="menuView_Edit"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -44,6 +64,46 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionAdd">
+   <property name="text">
+    <string>Add</string>
+   </property>
+  </action>
+  <action name="action_open">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="action_Save">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="action_Save_As">
+   <property name="text">
+    <string>Save as...</string>
+   </property>
+  </action>
+  <action name="action_new_artist">
+   <property name="text">
+    <string>Add artist</string>
+   </property>
+  </action>
+  <action name="action_new_album">
+   <property name="text">
+    <string>Add album</string>
+   </property>
+  </action>
+  <action name="action_new_song">
+   <property name="text">
+    <string>Add song</string>
+   </property>
+  </action>
+  <action name="action_delete">
+   <property name="text">
+    <string>delete</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

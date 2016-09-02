@@ -15,14 +15,21 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     item.cpp \
-    musicmodel_v3.cpp \
     musicmodel.cpp \
-    ratingdelegate.cpp
+    ratingdelegate.cpp \
+    albumdialog.cpp \
+    artistdialog.cpp \
+    trackdialog.cpp
 
 HEADERS  += mainwindow.h \
     item.h \
-    musicmodel_v3.h \
     musicmodel.h \
-    ratingdelegate.h
+    ratingdelegate.h \
+    albumdialog.h \
+    artistdialog.h \
+    trackdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    albumdialog.ui \
+    artistdialog.ui \
+    trackdialog.ui
